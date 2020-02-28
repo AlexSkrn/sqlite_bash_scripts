@@ -54,13 +54,13 @@ echo "Selecting data from the college.sqlite database"
 #   and enrollment > 20000 and major = 'CS';
 # EOF
 
-echo "All large campuses with CS applicants WITH ERROR FIXED"
-sqlite3 ./db/college.sqlite << EOF
-select College.cName
-from College, Apply
-where College.cName = Apply.cName
-  and enrollment > 20000 and major = 'CS';
-EOF
+# echo "All large campuses with CS applicants WITH ERROR FIXED"
+# sqlite3 ./db/college.sqlite << EOF
+# select College.cName
+# from College, Apply
+# where College.cName = Apply.cName
+#   and enrollment > 20000 and major = 'CS';
+# EOF
 #
 # # /*** Add Distinct ***/
 #
@@ -77,13 +77,16 @@ EOF
 # from Student, College, Apply
 # where Apply.sID = Student.sID and Apply.cName = College.cName;
 #
-# # /*** Sort by decreasing GPA ***/
-#
-# select Student.sID, sName, GPA, Apply.cName, enrollment
+# echo "Sort by decreasing GPA"
+# sqlite3 ./db/college.sqlite << EOF
+# .headers on
+# .mode column
+# select distinct Student.sID, sName, GPA, Apply.cName, enrollment
 # from Student, College, Apply
 # where Apply.sID = Student.sID and Apply.cName = College.cName
 # order by GPA desc;
-#
+# EOF
+
 # # /*** Then by increasing enrollment ***/
 #
 # select Student.sID, sName, GPA, Apply.cName, enrollment
@@ -105,22 +108,28 @@ EOF
 # from Apply
 # where major like '%bio%';
 #
-# # /**************************************************************
-# #   Select * cross-product
-# # **************************************************************/
-#
+# echo "/**************************************************************
+#   Select * cross-product
+# **************************************************************/"
+# sqlite3 ./db/college.sqlite << EOF
+# .headers on
+# .mode column
 # select *
 # from Student, College;
-#
-# # /**************************************************************
-# #   Add scaled GPA based on sizeHS
-# #   Also note missing Where clause
-# # **************************************************************/
-#
+# EOF
+
+echo "/**************************************************************
+  Add scaled GPA based on sizeHS
+  Also note missing Where clause
+**************************************************************/"
+
 # select sID, sName, GPA, sizeHS, GPA*(sizeHS/1000.0)
 # from Student;
-#
-# # /*** Rename result attribute ***/
-#
-# select sID, sName, GPA, sizeHS, GPA*(sizeHS/1000.0) as scaledGPA
-# from Student;
+
+echo "/*** Rename result attribute ***/"
+sqlite3 ./db/college.sqlite << EOF
+.headers on
+.mode column
+select sID, sName, GPA, sizeHS, GPA*(sizeHS/1000.0) as scaledGPA
+from Student;
+EOF
