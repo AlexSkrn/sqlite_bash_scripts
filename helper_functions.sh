@@ -15,3 +15,11 @@ sqlite3 ./db/ratings.sqlite << EOF
 $1
 EOF
 }
+
+query_social(){
+sqlite3 ./db/social.sqlite << EOF
+.headers on
+.mode column
+$1
+EOF
+}
